@@ -51,3 +51,12 @@ To follow along with the code in this repository, you will need to set up your l
 ```bash
    git clone SauravP97/rag-systems-masterclass
    cd rag-systems-masterclass
+```
+
+## References
+
+  1. Self RAG paper: https://arxiv.org/pdf/2310.11511
+  2. Corrective RAG paper: https://arxiv.org/pdf/2401.15884
+  3. My Youtube channel: https://www.youtube.com/@saurav_prateek_
+  4. Video on Self RAG: https://youtu.be/H9zMp5wzQjc?si=eAJgFaZWabGj8P6k
+  5. Video on Corrective RAG: https://youtu.be/vAJqCDaU9Oc?si=vsAXneR3shlWL9mj
