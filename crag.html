@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAG Master Class</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .flow-line {
+            stroke-dasharray: 10;
+            animation: dash 1s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -20; }
+        }
+        /* Custom selection color to match the React version */
+        ::selection {
+            background-color: rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-200 font-sans">
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden bg-slate-900 border-b border-slate-800 pt-24 pb-16 px-6">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="max-w-5xl mx-auto relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-6">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span>Based on arXiv:2401.15884</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white">
+                Corrective <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">RAG</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                A Master Class on building robust LLM applications by introducing self-reflection, evaluation, and active knowledge refinement into the retrieval pipeline.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-16 space-y-24">
+        
+        <!-- Section 1: The Problem -->
+        <section class="space-y-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-white mb-4">The Hallucination Bottleneck</h2>
+                <p class="text-slate-400 text-lg">
+                    Standard RAG blindly trusts the retrieved documents. If the retriever fetches irrelevant or incorrect data, the LLM is forced to rely on flawed context, leading to confident hallucinations.
+                </p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 bg-slate-900 p-8 rounded-2xl border border-slate-800">
+                <div class="flex flex-col items-center p-4 bg-slate-800 rounded-xl border border-rose-500/20">
+                    <i data-lucide="database" class="text-rose-400 mb-2 w-8 h-8"></i>
+                    <span class="font-semibold text-rose-300">Flawed Retrieval</span>
+                </div>
+                <i data-lucide="arrow-right" class="text-slate-600 hidden md:block w-6 h-6"></i>
+                <div class="flex flex-col items-center p-4 bg-slate-800 rounded-xl border border-slate-700">
+                    <i data-lucide="brain-circuit" class="text-slate-400 mb-2 w-8 h-8"></i>
+                    <span class="font-semibold text-slate-300">Standard LLM</span>
+                </div>
+                <i data-lucide="arrow-right" class="text-slate-600 hidden md:block w-6 h-6"></i>
+                <div class="flex flex-col items-center p-4 bg-slate-800 rounded-xl border border-rose-500/20">
+                    <i data-lucide="x-circle" class="text-rose-400 mb-2 w-8 h-8"></i>
+                    <span class="font-semibold text-rose-300">Hallucination</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Simulator -->
+        <section class="space-y-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-white mb-4">The CRAG Architecture</h2>
+                <p class="text-slate-400 text-lg">
+                    CRAG introduces a <strong>Retrieval Evaluator</strong>. It scores the retrieved documents and routes the data flow based on confidence levels. Experience the logic using the interactive simulator below.
+                </p>
+            </div>
+
+            <!-- Simulator Container -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+                <!-- Controls -->
+                <div class="p-6 border-b border-slate-800 flex flex-wrap justify-center gap-4 bg-slate-900/50">
+                    <button id="btn-correct" onclick="setScenario('correct')" class="sim-btn px-6 py-3 rounded-full font-semibold transition-all duration-300 border flex items-center gap-2 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-200">
+                        <i data-lucide="check-circle-2" class="w-[18px] h-[18px]"></i> High Confidence (Correct)
+                    </button>
+                    <button id="btn-incorrect" onclick="setScenario('incorrect')" class="sim-btn px-6 py-3 rounded-full font-semibold transition-all duration-300 border flex items-center gap-2 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-200">
+                        <i data-lucide="x-circle" class="w-[18px] h-[18px]"></i> Low Confidence (Incorrect)
+                    </button>
+                    <button id="btn-ambiguous" onclick="setScenario('ambiguous')" class="sim-btn px-6 py-3 rounded-full font-semibold transition-all duration-300 border flex items-center gap-2 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-200">
+                        <i data-lucide="help-circle" class="w-[18px] h-[18px]"></i> Mixed Confidence (Ambiguous)
+                    </button>
+                </div>
+
+                <!-- SVG Canvas -->
+                <div class="relative w-full aspect-[2/1] min-h-[400px] bg-slate-950 p-4">
+                    <svg viewBox="0 0 1000 500" class="w-full h-full">
+                        <defs>
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="4" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+
+                        <!-- Paths (Edges) -->
+                        <g fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path id="path-qr" d="M 120 250 L 220 250" class="stroke-slate-800 transition-colors duration-500"></path>
+                            <path id="path-re" d="M 380 250 L 480 250" class="stroke-slate-800 transition-colors duration-500"></path>
+                            <path id="path-eweb" d="M 640 230 Q 690 120 740 120" class="stroke-slate-800 transition-colors duration-500"></path>
+                            <path id="path-eref" d="M 640 270 Q 690 380 740 380" class="stroke-slate-800 transition-colors duration-500"></path>
+                            <path id="path-webl" d="M 900 120 Q 950 120 950 210 L 950 210" class="stroke-slate-800 transition-colors duration-500"></path>
+                            <path id="path-refl" d="M 900 380 Q 950 380 950 290 L 950 290" class="stroke-slate-800 transition-colors duration-500"></path>
+                        </g>
+
+                        <!-- Nodes -->
+                        <g id="nodes-container">
+                            <!-- Query -->
+                            <g id="node-query" transform="translate(40, 210)">
+                                <rect class="bg-rect transition-all duration-500" width="160" height="80" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"></rect>
+                                <g class="icon-group transition-all duration-500" transform="translate(16, 24)" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /></svg>
+                                </g>
+                                <text class="node-text transition-all duration-500" x="60" y="45" fill="#94a3b8" font-family="sans-serif" font-size="16">User Query</text>
+                            </g>
+                            <!-- Retriever -->
+                            <g id="node-retriever" transform="translate(220, 210)">
+                                <rect class="bg-rect transition-all duration-500" width="160" height="80" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"></rect>
+                                <g class="icon-group transition-all duration-500" transform="translate(16, 24)" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg>
+                                </g>
+                                <text class="node-text transition-all duration-500" x="60" y="45" fill="#94a3b8" font-family="sans-serif" font-size="16">Retriever</text>
+                            </g>
+                            <!-- Evaluator (Main) -->
+                            <g id="node-evaluator" transform="translate(480, 210)" data-main="true">
+                                <rect class="bg-rect transition-all duration-500" width="160" height="80" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"></rect>
+                                <g class="icon-group transition-all duration-500" transform="translate(16, 24)" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24"><path d="M12 2v20 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                                </g>
+                                <text class="node-text transition-all duration-500" x="60" y="45" fill="#94a3b8" font-family="sans-serif" font-size="16">Evaluator</text>
+                            </g>
+                            <!-- Web Search -->
+                            <g id="node-websearch" transform="translate(740, 80)">
+                                <rect class="bg-rect transition-all duration-500" width="160" height="80" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"></rect>
+                                <g class="icon-group transition-all duration-500" transform="translate(16, 24)" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                                </g>
+                                <text class="node-text transition-all duration-500" x="60" y="45" fill="#94a3b8" font-family="sans-serif" font-size="16">Web Search</text>
+                            </g>
+                            <!-- Refinement -->
+                            <g id="node-refinement" transform="translate(740, 340)">
+                                <rect class="bg-rect transition-all duration-500" width="160" height="80" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"></rect>
+                                <g class="icon-group transition-all duration-500" transform="translate(16, 24)" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                                </g>
+                                <text class="node-text transition-all duration-500" x="60" y="45" fill="#94a3b8" font-family="sans-serif" font-size="16">Refinement</text>
+                            </g>
+                            <!-- LLM -->
+                            <g id="node-llm" transform="translate(910, 210)">
+                                <rect class="bg-rect transition-all duration-500" width="160" height="80" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"></rect>
+                                <g class="icon-group transition-all duration-500" transform="translate(16, 24)" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" /><rect x="9" y="9" width="6" height="6" /><line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" /><line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" /><line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" /><line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" /></svg>
+                                </g>
+                                <text class="node-text transition-all duration-500" x="60" y="45" fill="#94a3b8" font-family="sans-serif" font-size="16">LLM</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="p-8 border-t border-slate-800 bg-slate-900 min-h-[160px]">
+                    <h3 id="panel-title" class="text-xl font-bold mb-3 text-slate-400">
+                        Select a Retrieval Scenario
+                    </h3>
+                    <p id="panel-desc" class="text-slate-300 leading-relaxed md:text-lg">
+                        Click one of the confidence levels above to see how the CRAG evaluator routes information to prevent hallucinations.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Deep Dive into Actions -->
+        <section class="grid md:grid-cols-3 gap-6">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                <i data-lucide="check-circle-2" class="text-emerald-400 mb-4 w-8 h-8"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Action A: Correct</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Triggered when the evaluator is highly confident. The documents are relevant, but may contain noise. CRAG sends them to the <strong>Knowledge Refinement</strong> module to extract only the most crucial facts before generation.
+                </p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                <i data-lucide="x-circle" class="text-rose-400 mb-4 w-8 h-8"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Action B: Incorrect</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Triggered when retrieval fails entirely. To prevent hallucinations, CRAG discards the local documents. It automatically generates keywords and triggers a <strong>Web Search</strong> to find accurate, external knowledge.
+                </p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                <i data-lucide="help-circle" class="text-amber-400 mb-4 w-8 h-8"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Action C: Ambiguous</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Triggered when confidence is mixed. CRAG combines strategies: it refines the helpful parts of the local retrieval while simultaneously running a Web Search to fill in the missing context.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: Decompose-then-Recompose -->
+        <section class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
+            <div class="p-8 md:p-12 border-b border-slate-800">
+                <h2 class="text-3xl font-bold text-white mb-4">Knowledge Refinement</h2>
+                <p class="text-slate-400 text-lg max-w-3xl">
+                    Even "Correct" documents contain conversational filler. The <strong>Decompose-then-Recompose</strong> algorithm ensures the LLM only sees high-density facts.
+                </p>
+            </div>
+            
+            <div class="p-8 md:p-12 bg-slate-950/50 flex flex-col md:flex-row items-center gap-8 justify-between">
+                <!-- Step 1 -->
+                <div class="flex-1 space-y-4 w-full">
+                    <div class="flex items-center gap-2 text-indigo-400 mb-2">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                        <h4 class="font-semibold">1. Decompose</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="h-8 bg-slate-800 rounded border border-slate-700 flex items-center px-3 text-xs text-slate-400">Original text chunk 1...</div>
+                        <div class="h-8 bg-slate-800 rounded border border-slate-700 flex items-center px-3 text-xs text-slate-400">Filler conversation...</div>
+                        <div class="h-8 bg-slate-800 rounded border border-slate-700 flex items-center px-3 text-xs text-slate-400">Crucial fact 2...</div>
+                        <div class="h-8 bg-slate-800 rounded border border-slate-700 flex items-center px-3 text-xs text-slate-400">Irrelevant tangent...</div>
+                    </div>
+                </div>
+
+                <i data-lucide="arrow-right" class="text-slate-600 rotate-90 md:rotate-0 flex-shrink-0 w-6 h-6"></i>
+
+                <!-- Step 2 -->
+                <div class="flex-1 space-y-4 w-full">
+                    <div class="flex items-center gap-2 text-indigo-400 mb-2">
+                        <i data-lucide="filter" class="w-5 h-5"></i>
+                        <h4 class="font-semibold">2. Filter</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="h-8 bg-emerald-500/10 rounded border border-emerald-500/30 flex items-center px-3 text-xs text-emerald-300">Keep: Original text chunk 1...</div>
+                        <div class="h-8 bg-rose-500/10 rounded border border-rose-500/30 flex items-center px-3 text-xs text-rose-400 line-through">Discard: Filler conversation...</div>
+                        <div class="h-8 bg-emerald-500/10 rounded border border-emerald-500/30 flex items-center px-3 text-xs text-emerald-300">Keep: Crucial fact 2...</div>
+                        <div class="h-8 bg-rose-500/10 rounded border border-rose-500/30 flex items-center px-3 text-xs text-rose-400 line-through">Discard: Irrelevant tangent...</div>
+                    </div>
+                </div>
+
+                <i data-lucide="arrow-right" class="text-slate-600 rotate-90 md:rotate-0 flex-shrink-0 w-6 h-6"></i>
+
+                <!-- Step 3 -->
+                <div class="flex-1 space-y-4 w-full">
+                    <div class="flex items-center gap-2 text-indigo-400 mb-2">
+                        <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
+                        <h4 class="font-semibold">3. Recompose</h4>
+                    </div>
+                    <div class="bg-indigo-500/10 rounded-lg border border-indigo-500/30 p-4 space-y-2">
+                        <div class="text-xs text-indigo-200 leading-relaxed font-medium">
+                            [Original text chunk 1...] <br/><br/> [Crucial fact 2...]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900 py-8 text-center text-slate-500 text-sm">
+        <p>Interactive CRAG Masterclass. Based on the paper "Corrective Retrieval Augmented Generation" (Yan et al., 2024).</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Simulator State & Configurations
+        const scenarios = {
+            none: {
+                title: "Select a Retrieval Scenario",
+                desc: "Click one of the confidence levels above to see how the CRAG evaluator routes information to prevent hallucinations.",
+                color: "text-slate-400"
+            },
+            correct: {
+                title: "Scenario: High Confidence",
+                desc: "The Evaluator deems the retrieved documents highly relevant. It routes them through Knowledge Refinement to strip out irrelevant filler before sending the concentrated facts to the LLM.",
+                color: "text-emerald-400"
+            },
+            incorrect: {
+                title: "Scenario: Low Confidence",
+                desc: "The Evaluator determines retrieval has failed. It discards the bad documents entirely and triggers an external Web Search to find accurate information for the LLM.",
+                color: "text-rose-400"
+            },
+            ambiguous: {
+                title: "Scenario: Mixed Confidence",
+                desc: "Retrieval quality is mixed. CRAG salvages useful facts via Knowledge Refinement AND performs a Web Search to fill gaps, merging both streams for the LLM.",
+                color: "text-amber-400"
+            }
+        };
+
+        const activePathsConfig = {
+            correct: ['qr', 're', 'eref', 'refl'],
+            incorrect: ['qr', 're', 'eweb', 'webl'],
+            ambiguous: ['qr', 're', 'eref', 'refl', 'eweb', 'webl']
+        };
+
+        const activeNodesConfig = {
+            correct: ['query', 'retriever', 'evaluator', 'refinement', 'llm'],
+            incorrect: ['query', 'retriever', 'evaluator', 'websearch', 'llm'],
+            ambiguous: ['query', 'retriever', 'evaluator', 'refinement', 'websearch', 'llm']
+        };
+
+        const pathColors = {
+            'qr': 'stroke-indigo-500',
+            're': 'stroke-indigo-500',
+            'eweb': 'stroke-amber-500',
+            'eref': 'stroke-emerald-500',
+            'webl': 'stroke-amber-500',
+            'refl': 'stroke-emerald-500'
+        };
+
+        const buttonsConfig = {
+            correct: { id: 'btn-correct', activeClasses: ['bg-emerald-500/20', 'border-emerald-500/50', 'text-emerald-300', 'shadow-[0_0_20px_rgba(16,185,129,0.2)]'] },
+            incorrect: { id: 'btn-incorrect', activeClasses: ['bg-rose-500/20', 'border-rose-500/50', 'text-rose-300', 'shadow-[0_0_20px_rgba(244,63,94,0.2)]'] },
+            ambiguous: { id: 'btn-ambiguous', activeClasses: ['bg-amber-500/20', 'border-amber-500/50', 'text-amber-300', 'shadow-[0_0_20px_rgba(245,158,11,0.2)]'] }
+        };
+
+        function setScenario(scenarioKey) {
+            // Update Buttons
+            Object.keys(buttonsConfig).forEach(key => {
+                const btn = document.getElementById(buttonsConfig[key].id);
+                const isSelected = key === scenarioKey;
+                
+                // Base classes
+                btn.className = "sim-btn px-6 py-3 rounded-full font-semibold transition-all duration-300 border flex items-center gap-2";
+                
+                if (isSelected) {
+                    btn.classList.add(...buttonsConfig[key].activeClasses);
+                } else {
+                    btn.classList.add('bg-slate-800', 'border-slate-700', 'text-slate-400', 'hover:bg-slate-700', 'hover:text-slate-200');
+                }
+            });
+
+            // Update Panel Text
+            const titleEl = document.getElementById('panel-title');
+            titleEl.textContent = scenarios[scenarioKey].title;
+            titleEl.className = `text-xl font-bold mb-3 transition-colors duration-300 ${scenarios[scenarioKey].color}`;
+            document.getElementById('panel-desc').textContent = scenarios[scenarioKey].desc;
+
+            // Determine active elements
+            const activePaths = activePathsConfig[scenarioKey] || [];
+            const activeNodes = activeNodesConfig[scenarioKey] || ['query']; // Query node is always active
+
+            // Update Paths
+            Object.keys(pathColors).forEach(pathKey => {
+                const pathEl = document.getElementById(`path-${pathKey}`);
+                const isPathActive = activePaths.includes(pathKey);
+                
+                if (isPathActive) {
+                    pathEl.setAttribute('class', `transition-colors duration-500 flow-line ${pathColors[pathKey]}`);
+                    pathEl.setAttribute('filter', 'url(#glow)');
+                } else {
+                    pathEl.setAttribute('class', 'stroke-slate-800 transition-colors duration-500');
+                    pathEl.removeAttribute('filter');
+                }
+            });
+
+            // Update Nodes
+            const allNodes = ['query', 'retriever', 'evaluator', 'websearch', 'refinement', 'llm'];
+            allNodes.forEach(nodeKey => {
+                const nodeGroup = document.getElementById(`node-${nodeKey}`);
+                const isNodeActive = activeNodes.includes(nodeKey);
+                const isMainNode = nodeGroup.dataset.main === 'true';
+
+                const rect = nodeGroup.querySelector('.bg-rect');
+                const iconGrp = nodeGroup.querySelector('.icon-group');
+                const text = nodeGroup.querySelector('.node-text');
+
+                if (isNodeActive) {
+                    rect.setAttribute('fill', isMainNode ? '#4f46e5' : '#1e293b');
+                    rect.setAttribute('stroke', isMainNode ? '#818cf8' : '#38bdf8');
+                    rect.setAttribute('stroke-width', '2');
+                    rect.setAttribute('filter', 'url(#glow)');
+                    
+                    iconGrp.setAttribute('stroke', '#ffffff');
+                    
+                    text.setAttribute('fill', '#ffffff');
+                    text.setAttribute('font-weight', 'bold');
+                } else {
+                    rect.setAttribute('fill', '#0f172a');
+                    rect.setAttribute('stroke', '#334155');
+                    rect.setAttribute('stroke-width', '1');
+                    rect.removeAttribute('filter');
+                    
+                    iconGrp.setAttribute('stroke', '#64748b');
+                    
+                    text.setAttribute('fill', '#94a3b8');
+                    text.setAttribute('font-weight', 'normal');
+                }
+            });
+        }
+
+        // Initialize with default state (only Query active)
+        setScenario('none');
+    </script>
+</body>
+</html>

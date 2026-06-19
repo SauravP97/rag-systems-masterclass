@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-RAG Masterclass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for better dark mode look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-purple-500/30">
+
+    <div class="max-w-5xl mx-auto px-4 py-12">
+        
+        <!-- Header -->
+        <header class="mb-16 text-center">
+            <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-4 tracking-tight">
+                Self-RAG Masterclass
+            </h1>
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto">
+                Learning to Retrieve, Generate, and Critique through Self-Reflection
+            </p>
+        </header>
+
+        <main class="space-y-12">
+            <!-- Section 1: Problem -->
+            <section>
+                <h2 class="text-3xl font-bold text-white mb-6 border-b border-slate-800 pb-2">1. The Problem with Vanilla RAG</h2>
+                <div class="prose prose-invert prose-lg max-w-none text-slate-300">
+                    <p>Standard Retrieval-Augmented Generation (RAG) improved LLMs by giving them external knowledge. However, it suffers from critical flaws:</p>
+                    <ul class="space-y-2 mt-4">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-400 inline mr-2 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span><strong>Unnecessary Retrieval:</strong> Fetches documents for every query, wasting time on simple questions.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-400 inline mr-2 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span><strong>Irrelevant Context:</strong> If retrieval fails, the generator hallucinates based on bad context.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-red-400 inline mr-2 shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span><strong>Lack of Attribution:</strong> No guarantee the generated response is actually supported by the retrieved text.</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Architecture Diagram -->
+            <div class="flex flex-col gap-8 my-8">
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-700">
+                    <h4 class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-4">1. Vanilla RAG Architecture (Rigid Pipeline)</h4>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm font-mono">
+                        <div class="p-4 bg-slate-800 rounded-lg border border-slate-600 text-center w-full md:w-auto">User Query</div>
+                        <svg class="w-5 h-5 mx-2 text-blue-400 rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <div class="p-4 bg-blue-900/40 rounded-lg border border-blue-700 text-center w-full md:w-auto">Retriever<br/><span class="text-xs text-blue-400">(Always runs)</span></div>
+                        <svg class="w-5 h-5 mx-2 text-blue-400 rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <div class="p-4 bg-slate-800 rounded-lg border border-slate-600 text-center w-full md:w-auto text-xs">Query + Docs</div>
+                        <svg class="w-5 h-5 mx-2 text-blue-400 rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <div class="p-4 bg-green-900/40 rounded-lg border border-green-700 text-center w-full md:w-auto">LLM Generator</div>
+                        <svg class="w-5 h-5 mx-2 text-blue-400 rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <div class="p-4 bg-slate-800 rounded-lg border border-slate-600 text-center w-full md:w-auto">Final Output</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl">✨</div>
+                    <h4 class="text-purple-400 text-sm font-bold uppercase tracking-wider mb-4">2. Self-RAG Architecture (Dynamic & Reflective)</h4>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm font-mono relative">
+                        <div class="p-4 bg-slate-800 rounded-lg border border-slate-600 text-center z-10 w-full md:w-auto">User Query</div>
+                        <svg class="w-5 h-5 mx-2 text-blue-400 rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <div class="relative z-10 flex flex-col items-center w-full md:w-auto my-8 md:my-0">
+                            <div class="p-6 bg-purple-900/40 rounded-lg border border-purple-500 text-center shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                                <span class="font-bold text-white text-base">Self-RAG LLM</span>
+                                <div class="mt-2 text-xs text-purple-300 flex flex-col gap-1">
+                                    <span>Generate & Critique</span>
+                                    <span>Predicts Reflection Tokens</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Cyclic Retrieval Indication -->
+                            <div class="absolute -top-16 flex flex-col items-center">
+                                <div class="text-xs text-blue-400 mb-1">[Retrieve=Yes]</div>
+                                <div class="h-10 border-l-2 border-dashed border-blue-500"></div>
+                            </div>
+                            <div class="absolute -top-24 bg-blue-900/40 p-2 rounded border border-blue-500 text-xs text-center whitespace-nowrap">
+                                On-Demand Retriever
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 mx-2 text-blue-400 rotate-90 md:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        <div class="p-4 bg-slate-800 rounded-lg border border-slate-600 text-center z-10 w-full md:w-auto flex flex-col gap-2">
+                            <div>Final Output</div>
+                            <div class="text-xs text-slate-400">Selected via highest score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Solution -->
+            <section>
+                <h2 class="text-3xl font-bold text-white mb-6 border-b border-slate-800 pb-2">2. The Self-RAG Solution</h2>
+                <div class="prose prose-invert prose-lg max-w-none text-slate-300 mb-6">
+                    <p>Self-RAG trains a single LLM to self-reflect on its generation process on-demand using special <strong>reflection tokens</strong>.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 shadow-lg backdrop-blur-sm border-l-4 border-l-purple-500">
+                        <h4 class="font-bold text-purple-400 mb-2">[Retrieve]</h4>
+                        <p class="text-sm">Decides if external info is needed.<br/>Values: <code>Yes</code>, <code>No</code>, <code>Continue</code></p>
+                    </div>
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 shadow-lg backdrop-blur-sm border-l-4 border-l-blue-500">
+                        <h4 class="font-bold text-blue-400 mb-2">[IsREL] (Relevance)</h4>
+                        <p class="text-sm">Evaluates if the document contains useful info.<br/>Values: <code>Relevant</code>, <code>Irrelevant</code></p>
+                    </div>
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 shadow-lg backdrop-blur-sm border-l-4 border-l-green-500">
+                        <h4 class="font-bold text-green-400 mb-2">[IsSUP] (Supported)</h4>
+                        <p class="text-sm">Checks for hallucinations based on context.<br/>Values: <code>Fully</code>, <code>Partially</code>, <code>No support</code></p>
+                    </div>
+                    <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 shadow-lg backdrop-blur-sm border-l-4 border-l-orange-500">
+                        <h4 class="font-bold text-orange-400 mb-2">[IsUSE] (Utility)</h4>
+                        <p class="text-sm">Holistic score of how useful the response is.<br/>Values: <code>1</code> to <code>5</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Simulator -->
+            <section class="py-8">
+                <h2 class="text-3xl font-bold text-white mb-6 border-b border-slate-800 pb-2">3. Inference & Tree Decoding</h2>
+                
+                <div class="bg-slate-900/80 border border-purple-500/50 rounded-xl shadow-2xl overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-6 text-white">Interactive Self-RAG Simulator</h3>
+                        
+                        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 border-b border-slate-700 pb-4 gap-4">
+                            <div class="flex gap-2" id="progress-dots">
+                                <!-- Dots generated by JS -->
+                            </div>
+                            <div class="flex gap-3">
+                                <button id="btn-play" onclick="togglePlay()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded font-medium transition-colors border border-slate-600">
+                                    Auto-Play
+                                </button>
+                                <button onclick="handleReset()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded font-medium transition-colors border border-slate-600">
+                                    Reset
+                                </button>
+                                <button id="btn-next" onclick="handleNext()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded font-medium transition-colors">
+                                    Next Step
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6 min-h-[400px]">
+                            <!-- Step 0: Prompt -->
+                            <div id="step-0" class="transition-all duration-500 opacity-0 translate-y-4 hidden">
+                                <div class="bg-slate-800 p-4 rounded-lg border border-slate-600">
+                                    <span class="text-slate-400 font-bold text-sm">USER PROMPT: </span>
+                                    <span class="text-white">Who won the 2022 FIFA World Cup and who was the MVP?</span>
+                                </div>
+                            </div>
+
+                            <!-- Step 1: Retrieve -->
+                            <div id="step-1" class="transition-all duration-500 opacity-0 translate-y-4 hidden">
+                                <div class="flex items-center gap-3 bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                                    <span class="text-slate-300">Model Decision:</span>
+                                    <span class="px-2 py-1 rounded-md border text-xs font-mono mr-2 bg-purple-900/50 text-purple-300 border-purple-700">[Retrieve=Yes]</span>
+                                    <span class="text-sm text-slate-400 italic">"I need external information to answer this."</span>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Documents -->
+                            <div id="step-2" class="transition-all duration-500 opacity-0 translate-y-4 hidden">
+                                <h4 class="text-sm font-bold text-slate-400 mb-2">RETRIEVED DOCUMENTS (Top-K)</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-slate-800 p-3 rounded-lg border border-slate-600 text-sm text-slate-300">
+                                        <span class="text-blue-400 font-bold text-xs mb-1 block">Doc 1</span>
+                                        Argentina won the 2022 FIFA World Cup, defeating France in the final. Lionel Messi was phenomenal throughout the tournament.
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded-lg border border-slate-600 text-sm text-slate-300">
+                                        <span class="text-blue-400 font-bold text-xs mb-1 block">Doc 2</span>
+                                        The 2018 FIFA World Cup was won by France, with Kylian Mbappe shining as a young star.
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded-lg border border-slate-600 text-sm text-slate-300">
+                                        <span class="text-blue-400 font-bold text-xs mb-1 block">Doc 3</span>
+                                        Lionel Messi won the Golden Ball (MVP) award at the 2022 FIFA World Cup after leading his team to victory.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 & 4: Drafts & Critiques -->
+                            <div id="step-3" class="transition-all duration-500 opacity-0 translate-y-4 hidden">
+                                <h4 class="text-sm font-bold text-slate-400 mb-2">PARALLEL GENERATION & CRITIQUE</h4>
+                                <div class="space-y-3">
+                                    
+                                    <!-- Draft 1 (Winning Draft) -->
+                                    <div id="draft-0" class="bg-slate-800 p-4 rounded-lg border border-slate-600 flex flex-col md:flex-row justify-between gap-4 transition-all duration-500">
+                                        <div class="flex-1">
+                                            <span class="text-xs text-slate-500 block mb-1">Based on Doc 1</span>
+                                            <span class="text-white">Argentina won the 2022 World Cup. </span>
+                                        </div>
+                                        <div class="critique-box flex flex-col gap-2 items-end transition-all duration-500 opacity-0">
+                                            <div class="flex flex-wrap gap-1 justify-end">
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-blue-900/50 text-blue-300 border-blue-700">[IsREL=Relevant]</span>
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-green-900/50 text-green-300 border-green-700">[IsSUP=Fully Supported]</span>
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-orange-900/50 text-orange-300 border-orange-700">[IsUSE=4]</span>
+                                            </div>
+                                            <div class="text-sm">Score: <span class="font-mono font-bold text-yellow-400">8.5</span></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Draft 2 -->
+                                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-600 flex flex-col md:flex-row justify-between gap-4 transition-all duration-500">
+                                        <div class="flex-1">
+                                            <span class="text-xs text-slate-500 block mb-1">Based on Doc 2</span>
+                                            <span class="text-white">France won the World Cup. </span>
+                                        </div>
+                                        <div class="critique-box flex flex-col gap-2 items-end transition-all duration-500 opacity-0">
+                                            <div class="flex flex-wrap gap-1 justify-end">
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-blue-900/50 text-blue-300 border-blue-700">[IsREL=Irrelevant]</span>
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-green-900/50 text-green-300 border-green-700">[IsSUP=Fully Supported]</span>
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-orange-900/50 text-orange-300 border-orange-700">[IsUSE=1]</span>
+                                            </div>
+                                            <div class="text-sm">Score: <span class="font-mono font-bold text-yellow-400">2.1</span></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Draft 3 -->
+                                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-600 flex flex-col md:flex-row justify-between gap-4 transition-all duration-500">
+                                        <div class="flex-1">
+                                            <span class="text-xs text-slate-500 block mb-1">Based on Doc 3</span>
+                                            <span class="text-white">Lionel Messi was the MVP. </span>
+                                        </div>
+                                        <div class="critique-box flex flex-col gap-2 items-end transition-all duration-500 opacity-0">
+                                            <div class="flex flex-wrap gap-1 justify-end">
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-blue-900/50 text-blue-300 border-blue-700">[IsREL=Relevant]</span>
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-green-900/50 text-green-300 border-green-700">[IsSUP=Fully Supported]</span>
+                                                <span class="px-2 py-1 rounded-md border text-xs font-mono bg-orange-900/50 text-orange-300 border-orange-700">[IsUSE=4]</span>
+                                            </div>
+                                            <div class="text-sm">Score: <span class="font-mono font-bold text-yellow-400">8.2</span></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Step 5: Final Output -->
+                            <div id="step-5" class="transition-all duration-500 opacity-0 translate-y-4 hidden">
+                                <div class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 p-5 rounded-xl border border-purple-500/50 mt-4">
+                                    <h4 class="text-sm font-bold text-purple-300 mb-2">FINAL SELECTED RESPONSE</h4>
+                                    <p class="text-lg text-white font-medium">Argentina won the 2022 FIFA World Cup, and Lionel Messi was the MVP.</p>
+                                    <div class="mt-3 text-xs text-slate-400 border-t border-slate-700/50 pt-2 flex gap-2 items-center">
+                                        <svg class="w-5 h-5 text-green-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        Highest scoring segment appended to final output.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-24 text-center text-slate-500 text-sm border-t border-slate-800 pt-8">
+            <p>Based on the paper: "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection" (Asai et al., 2023)</p>
+        </footer>
+
+    </div>
+
+    <!-- Simulator Logic -->
+    <script>
+        let step = 0;
+        let isPlaying = false;
+        let timer = null;
+
+        // Initialize progress dots
+        const dotsContainer = document.getElementById('progress-dots');
+        for (let i = 0; i <= 5; i++) {
+            const dot = document.createElement('div');
+            dot.id = `dot-${i}`;
+            dot.className = `h-2 w-10 sm:w-12 rounded-full transition-colors duration-500 ${i === 0 ? 'bg-purple-500' : 'bg-slate-700'}`;
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateUI() {
+            // Update step visibility
+            const steps = ['step-0', 'step-1', 'step-2', 'step-3', 'step-3', 'step-5']; // Index 4 is tied to step-3 container
+            
+            for (let i = 0; i <= 5; i++) {
+                if (i === 4) continue; // step 4 logic is internal to step-3 container
+                const el = document.getElementById(steps[i]);
+                if (step >= i) {
+                    el.classList.remove('opacity-0', 'translate-y-4', 'hidden');
+                    el.classList.add('opacity-100', 'translate-y-0');
+                } else {
+                    el.classList.remove('opacity-100', 'translate-y-0');
+                    el.classList.add('opacity-0', 'translate-y-4', 'hidden');
+                }
+            }
+
+            // Update critiques inside step 3 (shows on step 4)
+            const critiques = document.querySelectorAll('.critique-box');
+            critiques.forEach(el => {
+                if (step >= 4) {
+                    el.classList.remove('opacity-0');
+                    el.classList.add('opacity-100');
+                } else {
+                    el.classList.remove('opacity-100');
+                    el.classList.add('opacity-0');
+                }
+            });
+
+            // Update Draft 0 styling (highlight on step 5)
+            const firstDraft = document.getElementById('draft-0');
+            if (step >= 5) {
+                firstDraft.classList.remove('border-slate-600');
+                firstDraft.classList.add('border-green-500', 'bg-green-900/20');
+            } else {
+                firstDraft.classList.add('border-slate-600');
+                firstDraft.classList.remove('border-green-500', 'bg-green-900/20');
+            }
+
+            // Update dots
+            for (let i = 0; i <= 5; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= step) {
+                    dot.classList.remove('bg-slate-700');
+                    dot.classList.add('bg-purple-500');
+                } else {
+                    dot.classList.remove('bg-purple-500');
+                    dot.classList.add('bg-slate-700');
+                }
+            }
+
+            // Update buttons
+            document.getElementById('btn-play').innerText = isPlaying ? 'Pause' : 'Auto-Play';
+            document.getElementById('btn-next').disabled = step === 5;
+            if (step === 5) {
+                document.getElementById('btn-next').classList.add('opacity-50');
+            } else {
+                document.getElementById('btn-next').classList.remove('opacity-50');
+            }
+        }
+
+        function setStep(newStep) {
+            if (newStep > 5) newStep = 5;
+            if (newStep < 0) newStep = 0;
+            step = newStep;
+            updateUI();
+            
+            if (isPlaying && step === 5) {
+                isPlaying = false;
+                clearInterval(timer);
+                updateUI();
+            }
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                if (step === 5) setStep(0);
+                timer = setInterval(() => {
+                    if (step < 5) {
+                        setStep(step + 1);
+                    }
+                }, 2000);
+            } else {
+                clearInterval(timer);
+            }
+            updateUI();
+        }
+
+        function handleNext() {
+            if (step < 5) setStep(step + 1);
+        }
+
+        function handleReset() {
+            isPlaying = false;
+            clearInterval(timer);
+            setStep(0);
+        }
+
+        // Initial setup
+        updateUI();
+    </script>
+</body>
+</html>
