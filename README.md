@@ -1,5 +1,7 @@
 # Getting Started with RAG Systems
 
+![banner](./media/banner.jpeg)
+
 Welcome to the official repository for the **"Getting Started with RAG Systems"** masterclass, presented at the **Amrita School of AI**.
 
 This repository contains all the code, notebooks, and resources you will need to follow along with the session and build your own Retrieval-Augmented Generation (RAG) applications.
