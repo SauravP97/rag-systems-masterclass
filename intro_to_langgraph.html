@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Explainer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-[#0a0a0a] text-gray-200 font-sans selection:bg-blue-500/30">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2 text-white font-bold text-xl">
+                <i data-lucide="network" class="text-blue-500"></i>
+                <span>GraphFlow<span class="text-blue-500">.ai</span></span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
+                <a href="#agentic" class="hover:text-white transition-colors">Agentic Workflows</a>
+                <a href="#core" class="hover:text-white transition-colors">Core Concepts</a>
+                <a href="#example" class="hover:text-white transition-colors">Basic Example</a>
+            </div>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                Start Building
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6 relative overflow-hidden">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center space-x-2 bg-blue-900/30 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-full text-sm font-medium mb-8">
+                <i data-lucide="bot" class="w-4 h-4"></i>
+                <span>The standard for LLM orchestration</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-8">
+                Build <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Agentic Workflows</span> <br class="hidden md:block" />
+                with LangGraph.
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                Move beyond simple, linear chains. LangGraph allows you to build stateful, multi-actor applications with cyclical graphs. Control flow, shared memory, and reliable agents—all in one framework.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <button class="w-full sm:w-auto px-8 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2">
+                    <span>Read the Docs</span>
+                    <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
+                </button>
+                <button class="w-full sm:w-auto px-8 py-3 bg-transparent border border-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2">
+                    <i data-lucide="code" class="w-[18px] h-[18px]"></i>
+                    <span>View Examples</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agentic Workflows Section -->
+    <section id="agentic" class="py-20 px-6 border-t border-gray-800/50 bg-[#0f1115]">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Why Agentic Workflows?</h2>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Traditional LLM chains execute top-to-bottom. But true intelligence requires reasoning, looping, and tool usage based on dynamic conditions. This is an <strong>Agentic Workflow</strong>.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start space-x-3">
+                            <div class="mt-1 bg-blue-500/20 text-blue-400 p-1 rounded-full"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+                            <span class="text-gray-300">Cyclical execution (Loops) for planning and reflection.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <div class="mt-1 bg-blue-500/20 text-blue-400 p-1 rounded-full"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+                            <span class="text-gray-300">Stateful memory that persists across multiple agent turns.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <div class="mt-1 bg-blue-500/20 text-blue-400 p-1 rounded-full"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+                            <span class="text-gray-300">Multi-agent collaboration where distinct AI profiles interact.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <div class="mt-1 bg-blue-500/20 text-blue-400 p-1 rounded-full"><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+                            <span class="text-gray-300">Human-in-the-loop capabilities to pause and approve actions.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="relative">
+                    <div class="bg-gray-900 border border-gray-800 p-8 rounded-2xl relative shadow-2xl">
+                        <div class="flex flex-col items-center space-y-8">
+                            <div class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg font-mono text-sm z-10 w-48 text-center border border-blue-500">User Input</div>
+                            <div class="h-8 border-l-2 border-dashed border-gray-600"></div>
+                            <div class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg font-mono text-sm z-10 border border-gray-700 w-48 text-center relative">
+                                Agent (Reasoning)
+                                <div class="absolute top-1/2 -right-16 w-12 h-24 border-t-2 border-r-2 border-b-2 border-dashed border-blue-500 rounded-r-xl -translate-y-1/2"></div>
+                                <div class="absolute top-[80%] -right-5 text-blue-500"><i data-lucide="arrow-right" class="w-4 h-4 -rotate-180"></i></div>
+                            </div>
+                            <div class="flex space-x-12 relative">
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 w-40 h-8 border-t-2 border-x-2 border-dashed border-gray-600 rounded-t-xl"></div>
+                                <div class="bg-purple-900/50 text-purple-300 px-6 py-3 rounded-lg border border-purple-500/50 font-mono text-sm mt-8 w-32 text-center">Tool: Search</div>
+                                <div class="bg-green-900/50 text-green-300 px-6 py-3 rounded-lg border border-green-500/50 font-mono text-sm mt-8 w-32 text-center">Tool: SQL</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Concepts Section -->
+    <section id="core" class="py-24 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">The Graph Architecture</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    LangGraph models your application as a graph. You define the <strong>State</strong>, create <strong>Nodes</strong> to do the work, and draw <strong>Edges</strong> to dictate the flow.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <!-- State Card -->
+                <div id="card-state" onclick="setActiveConcept('state')" class="concept-card p-6 rounded-xl border transition-all duration-300 cursor-pointer bg-blue-900/20 border-blue-500/50 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]">
+                    <div id="icon-bg-state" class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-blue-500/20 text-blue-400">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">1. Shared State</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">A typed dictionary or Pydantic model that is passed around. Every node reads from it and returns updates to be merged into it.</p>
+                </div>
+
+                <!-- Nodes Card -->
+                <div id="card-nodes" onclick="setActiveConcept('nodes')" class="concept-card p-6 rounded-xl border transition-all duration-300 cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-800/50">
+                    <div id="icon-bg-nodes" class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-800 text-gray-400">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">2. Nodes</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Python functions or LCEL runnables that contain your agent logic. They receive the current State, perform work, and return State updates.</p>
+                </div>
+
+                <!-- Edges Card -->
+                <div id="card-edges" onclick="setActiveConcept('edges')" class="concept-card p-6 rounded-xl border transition-all duration-300 cursor-pointer bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-800/50">
+                    <div id="icon-bg-edges" class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gray-800 text-gray-400">
+                        <i data-lucide="git-merge" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">3. Edges</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">The 'wires' connecting nodes. Use regular edges for fixed sequences, and Conditional Edges to route logic dynamically (e.g., if/else).</p>
+                </div>
+            </div>
+
+            <div class="mt-8 transition-all duration-500 relative">
+                <div class="absolute inset-0 bg-blue-500/5 blur-3xl rounded-3xl"></div>
+                <div class="relative">
+                    <h3 id="concept-title" class="text-xl font-semibold text-white mb-4 flex items-center">
+                        <i data-lucide="terminal" class="mr-2 w-5 h-5"></i>
+                        <span>Defining Shared State</span>
+                    </h3>
+                    
+                    <!-- Code Block UI -->
+                    <div class="rounded-lg overflow-hidden bg-[#0d1117] border border-gray-800 shadow-2xl my-6">
+                        <div class="flex items-center px-4 py-2 bg-[#161b22] border-b border-gray-800">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="ml-4 text-xs text-gray-400 font-mono flex items-center">
+                                <i data-lucide="terminal" class="mr-2 w-3 h-3"></i>
+                                main.py
+                            </div>
+                        </div>
+                        <div class="p-4 overflow-x-auto">
+                            <pre class="text-sm font-mono text-gray-300 leading-relaxed"><code id="concept-code">from typing import TypedDict, Annotated
+import operator
+
+# 1. Define the Shared State
+class AgentState(TypedDict):
+    messages: Annotated[list, operator.add]
+    current_thought: str
+    status: str</code></pre>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Basic Workflow Example Section -->
+    <section id="example" class="py-24 px-6 border-t border-gray-800/50 bg-[#0f1115]">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 text-center md:text-left">
+                <div class="inline-flex items-center space-x-2 bg-purple-900/30 border border-purple-500/30 text-purple-400 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                    <i data-lucide="code" class="w-4 h-4"></i>
+                    <span>Putting it all together</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Example: Simple Sequential Pipeline</h2>
+                <p class="text-gray-400 max-w-3xl leading-relaxed">
+                    Here is a basic, easy-to-understand execution flow. This example removes complex LLM logic to focus purely on how LangGraph passes state sequentially across three simple nodes.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                <div class="lg:col-span-4 bg-[#0a0a0a] border border-gray-800 rounded-2xl p-8 sticky top-24 shadow-2xl">
+                    <h3 class="text-xl font-semibold text-white mb-10 flex items-center justify-center">
+                        <i data-lucide="network" class="mr-2 text-blue-500 w-5 h-5"></i>
+                        Graph Flow
+                    </h3>
+                    
+                    <div class="flex flex-col items-center relative space-y-4">
+                        <div class="bg-green-900/30 text-green-400 px-5 py-2 rounded-full font-mono text-xs border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.1)]">__START__</div>
+                        <i data-lucide="arrow-right" class="text-gray-600 rotate-90 w-5 h-5"></i>
+                        <div class="bg-blue-900/30 text-blue-300 px-8 py-3 rounded-xl border border-blue-500/50 font-mono font-bold w-48 text-center shadow-[0_0_15px_rgba(59,130,246,0.2)]">Node A</div>
+                        <i data-lucide="arrow-right" class="text-gray-600 rotate-90 w-5 h-5"></i>
+                        <div class="bg-purple-900/30 text-purple-300 px-8 py-3 rounded-xl border border-purple-500/50 font-mono font-bold w-48 text-center shadow-[0_0_15px_rgba(168,85,247,0.2)]">Node B</div>
+                        <i data-lucide="arrow-right" class="text-gray-600 rotate-90 w-5 h-5"></i>
+                        <div class="bg-amber-900/30 text-amber-300 px-8 py-3 rounded-xl border border-amber-500/50 font-mono font-bold w-48 text-center shadow-[0_0_15px_rgba(245,158,11,0.2)]">Node C</div>
+                        <i data-lucide="arrow-right" class="text-gray-600 rotate-90 w-5 h-5"></i>
+                        <div class="bg-red-900/30 text-red-400 px-5 py-2 rounded-full font-mono text-xs border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]">__END__</div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8">
+                    <!-- Code Block UI for Example -->
+                    <div class="rounded-lg overflow-hidden bg-[#0d1117] border border-gray-800 shadow-2xl">
+                        <div class="flex items-center px-4 py-2 bg-[#161b22] border-b border-gray-800">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="ml-4 text-xs text-gray-400 font-mono flex items-center">
+                                <i data-lucide="terminal" class="mr-2 w-3 h-3"></i>
+                                main.py
+                            </div>
+                        </div>
+                        <div class="p-4 overflow-x-auto">
+                            <pre class="text-sm font-mono text-gray-300 leading-relaxed"><code>from typing import TypedDict
+from langgraph.graph import StateGraph, END
+
+# 1. Define a simple State
+class MyState(TypedDict):
+    message: str
+
+# 2. Define 3 simple Nodes
+def node_a(state: MyState):
+    return {"message": state["message"] + " -> Node A"}
+
+def node_b(state: MyState):
+    return {"message": state["message"] + " -> Node B"}
+
+def node_c(state: MyState):
+    return {"message": state["message"] + " -> Node C"}
+
+# 3. Build the Graph
+workflow = StateGraph(MyState)
+
+# Add nodes to the graph
+workflow.add_node("A", node_a)
+workflow.add_node("B", node_b)
+workflow.add_node("C", node_c)
+
+# 4. Connect Edges (Sequential Flow)
+workflow.set_entry_point("A")
+workflow.add_edge("A", "B")
+workflow.add_edge("B", "C")
+workflow.add_edge("C", END)
+
+# 5. Compile into a runnable application
+app = workflow.compile()
+
+# Execution: app.invoke({"message": "Start"}) 
+# Result: {"message": "Start -> Node A -> Node B -> Node C"}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-[#0a0a0a] py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 text-white font-bold text-xl mb-4 md:mb-0">
+                <i data-lucide="network" class="text-blue-500"></i>
+                <span>GraphFlow<span class="text-blue-500">.ai</span></span>
+            </div>
+            <p class="text-gray-500 text-sm text-center md:text-left">
+                © <script>document.write(new Date().getFullYear())</script> GraphFlow Explainer. Built to explain LangGraph concepts.
+            </p>
+            <div class="flex space-x-6 mt-4 md:mt-0 text-sm text-gray-400">
+                <a href="#" class="hover:text-white">Documentation</a>
+                <a href="#" class="hover:text-white">GitHub</a>
+                <a href="#" class="hover:text-white">Discord</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Data for Interactive Section
+        const concepts = {
+            state: {
+                title: "Shared State",
+                code: `from typing import TypedDict, Annotated
+import operator
+
+# 1. Define the Shared State
+class AgentState(TypedDict):
+    messages: Annotated[list, operator.add]
+    current_thought: str
+    status: str`
+            },
+            nodes: {
+                title: "Nodes",
+                code: `# 2. Define Nodes (Python functions)
+def generate_thought(state: AgentState):
+    # Process state and generate thought
+    return {"current_thought": "I need to search the web."}
+
+def execute_tool(state: AgentState):
+    # Execute tool based on thought
+    return {"messages": ["Tool result: Weather is 72F"]}
+
+def finalize_response(state: AgentState):
+    return {"status": "completed"}`
+            },
+            edges: {
+                title: "Edges & Routing",
+                code: `from langgraph.graph import StateGraph, END
+
+# 3. Build the Graph with Edges
+workflow = StateGraph(AgentState)
+
+# Add Nodes
+workflow.add_node("think", generate_thought)
+workflow.add_node("act", execute_tool)
+workflow.add_node("respond", finalize_response)
+
+# Define Edges
+workflow.set_entry_point("think")
+
+# Conditional Edge
+def route_next(state: AgentState):
+    if "search" in state["current_thought"]:
+        return "act"
+    return "respond"
+
+workflow.add_conditional_edges("think", route_next)
+workflow.add_edge("act", "think") # Cyclic graph!
+workflow.add_edge("respond", END)`
+            }
+        };
+
+        // Styling definitions
+        const activeCardClass = "bg-blue-900/20 border-blue-500/50 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]".split(" ");
+        const inactiveCardClass = "bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-800/50".split(" ");
+        const activeIconBgClass = "bg-blue-500/20 text-blue-400".split(" ");
+        const inactiveIconBgClass = "bg-gray-800 text-gray-400".split(" ");
+
+        function setActiveConcept(conceptKey) {
+            const keys = ['state', 'nodes', 'edges'];
+            
+            // Reset all cards to inactive
+            keys.forEach(key => {
+                const card = document.getElementById(`card-${key}`);
+                const iconBg = document.getElementById(`icon-bg-${key}`);
+                
+                // Remove active classes
+                card.classList.remove(...activeCardClass);
+                iconBg.classList.remove(...activeIconBgClass);
+                
+                // Add inactive classes
+                card.classList.add(...inactiveCardClass);
+                iconBg.classList.add(...inactiveIconBgClass);
+            });
+
+            // Set the clicked card to active
+            const activeCard = document.getElementById(`card-${conceptKey}`);
+            const activeIconBg = document.getElementById(`icon-bg-${conceptKey}`);
+            
+            // Remove inactive classes
+            activeCard.classList.remove(...inactiveCardClass);
+            activeIconBg.classList.remove(...inactiveIconBgClass);
+            
+            // Add active classes
+            activeCard.classList.add(...activeCardClass);
+            activeIconBg.classList.add(...activeIconBgClass);
+
+            // Update content
+            const titleEl = document.getElementById('concept-title');
+            titleEl.innerHTML = `<i data-lucide="terminal" class="mr-2 w-5 h-5"></i><span>Defining ${concepts[conceptKey].title}</span>`;
+            
+            const codeEl = document.getElementById('concept-code');
+            codeEl.textContent = concepts[conceptKey].code;
+
+            // Re-initialize lucide icons for the newly injected title icon
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
